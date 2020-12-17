@@ -5,6 +5,7 @@ open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Bolero.Server.RazorHost
+open Microsoft.Extensions.Primitives
 
 type Startup() =
 
@@ -18,6 +19,9 @@ type Startup() =
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     member this.Configure(app: IApplicationBuilder, env: IWebHostEnvironment) =
         app
+            .Use(fun context next ->
+                context.Response.Headers.Add("Blazor-Environment", env.EnvironmentName |> StringValues)
+                next.Invoke())
             .UseStaticFiles()
             .UseRouting()
             .UseBlazorFrameworkFiles()
